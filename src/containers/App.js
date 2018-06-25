@@ -1,17 +1,44 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import classes from "./App.css";
 import Persons from "../components/Persons/Persons";
 import Cockpit from "../components/Cockpit/Cockpit";
+import Aux from "../hoc/Aux"
+import withClass from "../hoc/withClass";
 
-class App extends Component {
-  state = {
-    persons: [
-      { id: "asdf12", name: "Matt", age: 36 },
-      { id: "asdf13", name: "Katharine", age: 35 },
-      { id: "asdf14", name: "Chopper", age: 2 }
-    ],
-    showPersons: false
-  };
+class App extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      persons: [
+        { id: "asdf12", name: "Matt", age: 36 },
+        { id: "asdf13", name: "Katharine", age: 35 },
+        { id: "asdf14", name: "Chopper", age: 2 }
+      ],
+      showPersons: false,
+      toggleClicked: 0,
+    };
+    console.log("[App.js] Inside constructor", props);
+  }
+
+  componentWillMount() {
+    console.log("[App.js] Inside componentWillMount()");
+  }
+
+  componentDidMount() {
+    console.log("[App.js] Inside componentDidMount()");
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    console.log(
+      "[UPDATE App.js] Inside componentWillUpdate()",
+      nextProps,
+      nextState
+    );
+  }
+
+  componentDidUpdate() {
+    console.log("[UPDATE App.js] Inside componentDidUpdate()");
+  }
 
   deletePersonHandler = personIndex => {
     const persons = [...this.state.persons];
@@ -38,10 +65,16 @@ class App extends Component {
 
   togglePersonsHandler = () => {
     const doesShow = this.state.showPersons;
-    this.setState({ showPersons: !doesShow });
+    this.setState((prevState, props) => { 
+      return {
+        showPersons: !doesShow,
+        toggleClicked: prevState.toggleClicked + 1,
+      };
+    });
   };
 
   render() {
+    console.log("[App.js] Inside render()");
     let persons = null;
 
     if (this.state.showPersons) {
@@ -54,7 +87,14 @@ class App extends Component {
       );
     }
     return (
-      <div className={classes.App}>
+      <Aux>
+        <button
+          onClick={() => {
+            this.setState({ showPersons: true });
+          }}
+        >
+          Show Persons
+        </button>
         <Cockpit
           title={this.props.title}
           showPersons={this.state.showPersons}
@@ -62,9 +102,9 @@ class App extends Component {
           clicked={this.togglePersonsHandler}
         />
         {persons}
-      </div>
+      </Aux>
     );
   }
 }
 
-export default App;
+export default withClass(App, classes.App);
